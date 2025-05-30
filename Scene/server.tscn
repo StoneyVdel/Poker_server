@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://bcjvdq3qxavfa"]
+[gd_scene load_steps=13 format=3 uid="uid://bcjvdq3qxavfa"]
 
 [ext_resource type="Script" uid="uid://cilfjdp27ucu0" path="res://Multiplayer_Scripts/server.gd" id="1_4eex3"]
 [ext_resource type="Script" uid="uid://banxy56nrgm3q" path="res://Multiplayer_Scripts/table.gd" id="2_bt7ts"]
@@ -12,8 +12,174 @@
 [ext_resource type="Script" uid="uid://cydls7bvbrve6" path="res://Multiplayer_Scripts/opponent.gd" id="10_oahvv"]
 [ext_resource type="Script" uid="uid://cw4j61s1j4i8t" path="res://Multiplayer_Scripts/visuals.gd" id="11_fp44j"]
 
-[node name="Main" type="Node"]
+[sub_resource type="Theme" id="Theme_4eex3"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_4eex3")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(600, 400)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -347.0
+offset_top = -200.0
+offset_right = 293.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_4eex3")
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Timeout limit"
+
+[node name="Sub_time" type="Button" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "<"
+
+[node name="TimeoutTime" type="LineEdit" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "30"
+alignment = 1
+editable = false
+context_menu_enabled = false
+emoji_menu_enabled = false
+virtual_keyboard_enabled = false
+virtual_keyboard_type = 2
+shortcut_keys_enabled = false
+middle_mouse_paste_enabled = false
+selecting_enabled = false
+deselect_on_focus_loss_enabled = false
+drag_and_drop_selection_enabled = false
+
+[node name="Add_time" type="Button" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = ">"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Max players (max. 6)"
+
+[node name="Sub_player" type="Button" parent="VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "<"
+
+[node name="MaxPlayers" type="LineEdit" parent="VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "6"
+alignment = 1
+editable = false
+context_menu_enabled = false
+emoji_menu_enabled = false
+virtual_keyboard_type = 2
+shortcut_keys_enabled = false
+middle_mouse_paste_enabled = false
+selecting_enabled = false
+deselect_on_focus_loss_enabled = false
+drag_and_drop_selection_enabled = false
+
+[node name="Add_player" type="Button" parent="VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = ">"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Bet increase amount"
+
+[node name="MinBet" type="SpinBox" parent="VBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(196, 0)
+layout_mode = 2
+value = 10.0
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer4"]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Coins amount"
+
+[node name="CoinAmount" type="SpinBox" parent="VBoxContainer/HBoxContainer4"]
+custom_minimum_size = Vector2(196, 0)
+layout_mode = 2
+step = 10.0
+value = 100.0
+
+[node name="HBoxContainer5" type="HBoxContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer5"]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Minimum bet"
+
+[node name="BuyIn" type="SpinBox" parent="VBoxContainer/HBoxContainer5"]
+custom_minimum_size = Vector2(196, 0)
+layout_mode = 2
+value = 20.0
+
+[node name="HBoxContainer6" type="HBoxContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer6"]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Analytics"
+
+[node name="Analytics" type="Button" parent="VBoxContainer/HBoxContainer6"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+toggle_mode = true
+button_pressed = true
+text = "On"
+
+[node name="StartServer" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Start Server"
 
 [node name="GameLogic" type="Node" parent="."]
 script = ExtResource("2_bt7ts")
@@ -45,4 +211,26 @@ script = ExtResource("10_oahvv")
 [node name="Visuals" type="Node" parent="."]
 script = ExtResource("11_fp44j")
 
-[node name="TempTimer" type="Timer" parent="."]
+[node name="Line_log" type="Label" parent="."]
+custom_minimum_size = Vector2(400, 40)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -42.0
+offset_right = 200.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 30
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/Sub_time" to="." method="_on_sub_time_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/Add_time" to="." method="_on_add_time_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer2/Sub_player" to="." method="_on_sub_player_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer2/Add_player" to="." method="_on_add_player_pressed"]
+[connection signal="toggled" from="VBoxContainer/HBoxContainer6/Analytics" to="." method="_on_analytics_toggled"]
+[connection signal="pressed" from="VBoxContainer/StartServer" to="." method="_on_start_server_pressed"]

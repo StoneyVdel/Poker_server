@@ -18,6 +18,14 @@ func action_label_action(action):
 	action_scene_label.visible = false
 
 @rpc("authority", "call_remote", "reliable", 0)
+func are_analytics_allowed(allowed: bool):
+	pass
+
+@rpc("authority", "call_remote", "reliable", 0)
+func analytics_visible(on: bool):
+	pass
+	
+@rpc("authority", "call_remote", "reliable", 0)
 func cards_to_outline(game_stage: String):
 	pass
 	
@@ -37,9 +45,12 @@ func set_label(label: String, text: String):
 func update_action_log(action: String):
 	pass
 	#action_log.text += str(action, "\n")
-
+@rpc("authority", "call_remote", "reliable", 0)
+func clear_table():
+	pass
+	
 @rpc("any_peer", "call_remote", "reliable", 0)
-func set_chair(chair_info: Dictionary):
+func set_chair(chair_info: Dictionary, label_info : Dictionary):
 	for id in chair_info:
 		print("Chair :", id, "for user : ", chair_info[id])
 
@@ -50,4 +61,4 @@ func win_state(state: bool):
 @rpc("any_peer", "call_remote", "reliable", 0)
 func clear_chair(user: String):
 	table_ref.players.erase(user)
-	table_ref.player_data.erase(user)
+	table_ref.players_data.erase(user)

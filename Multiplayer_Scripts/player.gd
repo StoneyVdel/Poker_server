@@ -5,6 +5,7 @@ var table_ref
 var game_manager_ref
 var visuals_ref
 var opponent_ref
+var server_ref
 
 var timeout_timer
 var current_raise
@@ -20,7 +21,12 @@ func _ready() -> void:
 	opponent_ref = $"../Opponent"
 	table_ref = $"../GameLogic"
 	game_manager_ref = $"../GameManager"
+	server_ref = $".."
 	increase_amount = table_ref.increase_amount
+
+@rpc("authority", "call_remote", "reliable", 0)
+func set_timeout_time(time: int):
+	pass
 	
 @rpc("authority","call_remote", "reliable", 0)
 func add_players_to_table(user_id, chair_id):
@@ -29,20 +35,24 @@ func add_players_to_table(user_id, chair_id):
 	
 @rpc("authority", "call_remote", "reliable", 0)
 func set_player_id(id: int):
-	player_id=id
+	pass
 
-@rpc("authority", "call_remote", "reliable",0)
-func init(player_cards: Array, coins: int, increase_amount: int):
-	print("Initializing")
+@rpc("authority", "call_remote", "reliable", 0)
+func get_client_name():
+	pass
+
+@rpc("any_peer", "call_remote", "reliable", 0)
+func send_client_name(client_name: String):
+	server_ref.new_client_name = client_name
+	print(client_name)
 	
-	#Getting card images for the player cards
-	#visuals_ref.draw_card_image(player_cards, "Player")
-	#visuals_ref.set_label(visuals_ref.coin_label, coins)
+@rpc("authority", "call_remote", "reliable",0)
+func init(player_cards: Array, coins: int, increase_amount: int, is_new_game: bool):
+	pass
 
 @rpc("any_peer", "call_remote", "reliable", 0)
 func get_coins(player_id:int):
 	var coin = table_ref.get_bets(player_id)
-	print(coins)
 	set_coins.rpc_id(player_id, coin)
 	
 @rpc("authority", "call_remote", "reliable", 0)
@@ -59,7 +69,8 @@ func set_increase_amount(increase_amount):
 
 @rpc("any_peer", "call_remote", "reliable", 0)
 func folded(player_id:int):
-	table_ref.players.erase(player_id)
+	table_ref.players_state[player_id][3] = true
+	table_ref.players_state[player_id][0] = true
 
 @rpc("authority", "call_remote", "reliable", 0)
 func set_raise():
@@ -73,10 +84,13 @@ func user_raise(user_id: int, raise: int, action: String):
 	
 @rpc("any_peer", "call_remote", "reliable", 0)
 func server_end_move(user_id: int, action:String):
-	print("END MOVE SERVER", " User ID : ", user_id)
 	table_ref.players_state[game_manager_ref.current_user][0] = true
-	game_manager_ref.current_user = game_manager_ref.find_next_user(user_id)
-	visuals_ref.update_action_log.rpc(str(user_id, " ", action))
+	if table_ref.players_data[game_manager_ref.current_user][0] == 0:
+		table_ref.players.erase(game_manager_ref.current_user)
+	if table_ref.players.size() > 1:
+		var next_user = game_manager_ref.find_next_user(user_id)
+		game_manager_ref.current_user = next_user
+	visuals_ref.update_action_log.rpc(str(server_ref.label_info[server_ref.chair_info.find_key(user_id)], " ", action))
 	game_manager_ref.rotation()
 
 @rpc("authority", "call_remote", "reliable", 0)

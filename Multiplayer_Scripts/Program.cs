@@ -25,6 +25,12 @@ public partial class Program : Node
 		{
 			CardsFromGodot.Add(arr);
 		}
+		public void Clear()
+		{
+			CardsFromGodot.Clear();
+			users.Clear();
+			UserBets.Clear();
+		}
 		public void GetDataFromJSON(string json)
 		{
 			UserBets = new List<int>();
