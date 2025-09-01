@@ -47,7 +47,7 @@ func send_client_name(client_name: String):
 	print(client_name)
 	
 @rpc("authority", "call_remote", "reliable",0)
-func init(player_cards: Array, coins: int, increase_amount: int, is_new_game: bool):
+func init(player_cards: Array, coins: int, increase_amount: int):
 	pass
 
 @rpc("any_peer", "call_remote", "reliable", 0)
@@ -80,16 +80,15 @@ func set_raise():
 func user_raise(user_id: int, raise: int, action: String):
 	table_ref.table_bet(raise, user_id, action)
 	coins = table_ref.get_bets(user_id)
-	table_ref.reset_user_state()
+	#table_ref.reset_user_state()
 	
 @rpc("any_peer", "call_remote", "reliable", 0)
 func server_end_move(user_id: int, action:String):
 	table_ref.players_state[game_manager_ref.current_user][0] = true
-	if table_ref.players_data[game_manager_ref.current_user][0] == 0:
-		table_ref.players.erase(game_manager_ref.current_user)
-	if table_ref.players.size() > 1:
-		var next_user = game_manager_ref.find_next_user(user_id)
-		game_manager_ref.current_user = next_user
+	#if table_ref.players_data[game_manager_ref.current_user][0] == 0:
+		#table_ref.players.erase(game_manager_ref.current_user)
+	#var next_user = game_manager_ref.find_next_user(user_id)
+	game_manager_ref.current_user = game_manager_ref.find_next_user(user_id)
 	visuals_ref.update_action_log.rpc(str(server_ref.label_info[server_ref.chair_info.find_key(user_id)], " ", action))
 	game_manager_ref.rotation()
 

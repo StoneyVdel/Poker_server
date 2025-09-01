@@ -58,7 +58,7 @@ func _add_player_to_peer(id: int):
 	if new_client_name != null:
 		add_players_to_table(id)
 		if players_id.size() > 1:
-			$GameManager.start_game(true)
+			$GameManager.start_game()
 			visuals_ref.are_analytics_allowed.rpc(bool($VBoxContainer/HBoxContainer6/Analytics.button_pressed))
 			visuals_ref.analytics_visible.rpc(bool($VBoxContainer/HBoxContainer6/Analytics.button_pressed))
 	pass

@@ -1,10 +1,20 @@
 extends Node
 
-var current_user
+#player_data
+const player_coins = 0
+const player_pot = 1
+const card_names = 2
+const player_card_values = 3
+#player_state
+const is_final_move = 0
+const is_raising = 1
+const is_removed_from_chair = 2
+const is_folded = 3
+
+var current_user = null
 var deck_ref
 var table_ref
 var temp_timer = null
-#var action_timer
 var game_stage = "pre"
 var opponent_ref
 var visuals_ref
@@ -28,21 +38,20 @@ func _ready() -> void:
 
 func on_timeout():
 	table_ref.table_cards.clear()
-	start_game(false)
+	start_game()
 	
-func start_game(is_new_game):
-	print("Starting game...", is_new_game)
-	table_ref.players = server_ref.players_id.duplicate()
-	current_user = null
+func start_game():
+	print("Starting game...")
+	table_ref.players_all = server_ref.players_id.duplicate()
 	player_ref.disable_user_input.rpc()
 	await get_tree().create_timer(1).timeout
-	if table_ref.players.size() > 1:
-		table_ref.init(is_new_game)
+	if table_ref.players_all.size() > 1:
+		table_ref.init()
 		opponent_draw()
 		current_user = table_ref.players[0]
 		rotation()
 	
-func  opponent_draw():
+func opponent_draw():
 	for user in table_ref.players:
 		opponent_ref.opponent_card_draw.rpc(2, user)
 		pass
@@ -50,26 +59,27 @@ func  opponent_draw():
 func one_player():
 	player_ref.disable_user_input.rpc()
 	for i in table_ref.players_state:
-		table_ref.players_state[i][0] = true
+		table_ref.players_state[i][is_final_move] = true
 	table_ref.reset()
 	
 
 func rotation():
 	var state_check = true
 	check_if_remove()
-	print("table cards: ", table_ref.table_cards)
+	#print("table cards: ", table_ref.table_cards)
 	
 	if table_ref.players.size() == 1:
 		one_player()
 		
 	for i in table_ref.players_state:
-		if table_ref.players_state[i][0] == false || table_ref.players_state[i][3] == true:
+		if table_ref.players_state[i][is_final_move] == false || table_ref.players_state[i][is_folded] == true:
 			state_check = false
 			
 	if state_check == true:
 		var stage_index = table_ref.game_stage.find(game_stage)
 		game_stage = table_ref.game_stage[stage_index+1]
-		table_ref.reset_user_state()
+		stage_set()
+		#table_ref.reset_player_state()
 		print(game_stage)
 		
 		if game_stage == "flop":
@@ -86,21 +96,26 @@ func rotation():
 			opponent_ref.get_players_cards()
 			opponent_ref.show_opponent_hand.rpc(table_ref.players, opponent_ref.players_cards)
 			pass
+		
 	else : 
-		if table_ref.players_data[current_user][0] != 0 && table_ref.players_state[current_user][3] == false:
-			print("Current_user:", current_user, " ",table_ref.players_state[current_user][1], " ", table_ref.last_bet)
-			player_ref.user_turn.rpc_id(int(current_user), table_ref.players_state[current_user][1], table_ref.last_bet)
+		if table_ref.players_data[current_user][player_coins] != 0 && table_ref.players_state[current_user][is_folded] == false:
+			print("Current_user:", current_user, " ",table_ref.players_state[current_user][is_raising], " ", table_ref.last_bet)
+			player_ref.user_turn.rpc_id(int(current_user), table_ref.players_state[current_user][is_raising], table_ref.last_bet)
 		else:
-			if table_ref.players_data[current_user][0] == 0:
+			if table_ref.players_data[current_user][player_coins] == 0:
 				no_money()
 			else:
 				find_next_user(current_user)
 
 func check_if_remove():
 	for i in table_ref.players_state:
-		if table_ref.players_state[i][2] == true:
+		if table_ref.players_state[i][is_removed_from_chair] == true:
 			visuals_ref.clear_chair(i)
 
+func stage_set():
+	for i in table_ref.players_state:
+		table_ref.players_state[i][is_final_move] = false
+		
 func no_money():
 	var has_coins = 0
 	for i in table_ref.players_data:
@@ -108,7 +123,7 @@ func no_money():
 			has_coins+=1
 	if has_coins == table_ref.players_data.size():
 		for i in table_ref.players_state:
-			table_ref.players_state[i][0] = true
+			table_ref.players_state[i][is_final_move] = true
 		game_stage=table_ref.game_stage[table_ref.game_stage.find(game_stage)+1]
 		rotation()
 
@@ -127,15 +142,15 @@ func find_next_user(user):
 	var next_user_index = table_ref.players.find(user) + 1
 	var next_user
 	var not_folded = 0
-	var nfold_user
+	var not_fold_user
 	for i in table_ref.players:
-		if table_ref.players_state[i][3] == false:
+		if table_ref.players_state[i][is_folded] == false:
 			not_folded += 1
-			nfold_user = i
+			not_fold_user = i
 			
 	if not_folded <= 1:
-		table_ref.players_data[nfold_user][0] += round(table_ref.table_bets)
-		table_ref.reset()
+		table_ref.players_data[not_fold_user][player_coins] += round(table_ref.table_bets)
+		#table_ref.reset()
 		
 	if table_ref.players.size() > 1:
 		if next_user_index < table_ref.players.size():
