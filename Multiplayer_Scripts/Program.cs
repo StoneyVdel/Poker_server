@@ -29,7 +29,7 @@ public partial class Program : Node
 		{
 			CardsFromGodot.Clear();
 			users.Clear();
-			UserBets.Clear();
+			//UserBets.Clear();
 		}
 		public void GetDataFromJSON(string json)
 		{

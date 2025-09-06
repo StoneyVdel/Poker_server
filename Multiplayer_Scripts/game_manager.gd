@@ -1,16 +1,5 @@
 extends Node
 
-#player_data
-const player_coins = 0
-const player_pot = 1
-const card_names = 2
-const player_card_values = 3
-#player_state
-const is_final_move = 0
-const is_raising = 1
-const is_removed_from_chair = 2
-const is_folded = 3
-
 var current_user = null
 var deck_ref
 var table_ref
@@ -59,8 +48,8 @@ func opponent_draw():
 func one_player():
 	player_ref.disable_user_input.rpc()
 	for i in table_ref.players_state:
-		table_ref.players_state[i][is_final_move] = true
-	table_ref.reset()
+		table_ref.players_state[i][global_variables.PlayerStates.is_final_move] = true
+	#table_ref.reset()
 	
 
 func rotation():
@@ -72,7 +61,7 @@ func rotation():
 		one_player()
 		
 	for i in table_ref.players_state:
-		if table_ref.players_state[i][is_final_move] == false || table_ref.players_state[i][is_folded] == true:
+		if table_ref.players_state[i][global_variables.PlayerStates.is_final_move] == false || table_ref.players_state[i][global_variables.PlayerStates.is_folded] == true:
 			state_check = false
 			
 	if state_check == true:
@@ -98,23 +87,23 @@ func rotation():
 			pass
 		
 	else : 
-		if table_ref.players_data[current_user][player_coins] != 0 && table_ref.players_state[current_user][is_folded] == false:
-			print("Current_user:", current_user, " ",table_ref.players_state[current_user][is_raising], " ", table_ref.last_bet)
-			player_ref.user_turn.rpc_id(int(current_user), table_ref.players_state[current_user][is_raising], table_ref.last_bet)
+		if table_ref.players_data[current_user][global_variables.DataState.player_coins] != 0 && table_ref.players_state[current_user][global_variables.PlayerStates.is_folded] == false:
+			print("Current_user:", current_user, " ",table_ref.players_state[current_user][global_variables.PlayerStates.is_raising], " ", table_ref.last_bet)
+			player_ref.user_turn.rpc_id(int(current_user), table_ref.players_state[current_user][global_variables.PlayerStates.is_raising], table_ref.last_bet)
 		else:
-			if table_ref.players_data[current_user][player_coins] == 0:
+			if table_ref.players_data[current_user][global_variables.DataState.player_coins] == 0:
 				no_money()
 			else:
 				find_next_user(current_user)
 
 func check_if_remove():
 	for i in table_ref.players_state:
-		if table_ref.players_state[i][is_removed_from_chair] == true:
+		if table_ref.players_state[i][global_variables.PlayerStates.is_removed_from_chair] == true:
 			visuals_ref.clear_chair(i)
 
 func stage_set():
 	for i in table_ref.players_state:
-		table_ref.players_state[i][is_final_move] = false
+		table_ref.players_state[i][global_variables.PlayerStates.is_final_move] = false
 		
 func no_money():
 	var has_coins = 0
@@ -123,7 +112,7 @@ func no_money():
 			has_coins+=1
 	if has_coins == table_ref.players_data.size():
 		for i in table_ref.players_state:
-			table_ref.players_state[i][is_final_move] = true
+			table_ref.players_state[i][global_variables.PlayerStates.is_final_move] = true
 		game_stage=table_ref.game_stage[table_ref.game_stage.find(game_stage)+1]
 		rotation()
 
@@ -144,12 +133,12 @@ func find_next_user(user):
 	var not_folded = 0
 	var not_fold_user
 	for i in table_ref.players:
-		if table_ref.players_state[i][is_folded] == false:
+		if table_ref.players_state[i][global_variables.PlayerStates.is_folded] == false:
 			not_folded += 1
 			not_fold_user = i
 			
 	if not_folded <= 1:
-		table_ref.players_data[not_fold_user][player_coins] += round(table_ref.table_bets)
+		table_ref.players_data[not_fold_user][global_variables.DataState.player_coins] += round(table_ref.table_bets)
 		#table_ref.reset()
 		
 	if table_ref.players.size() > 1:

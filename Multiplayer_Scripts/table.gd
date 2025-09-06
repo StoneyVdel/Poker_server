@@ -6,16 +6,6 @@ const user_card_count = 2
 const win_state = true
 const loss_state = false
 const card_values = []
-#player_data
-const player_coins = 0
-const player_pot = 1
-const card_names = 2
-const player_card_values = 3
-#player_state
-const is_final_move = 0
-const is_raising = 1
-const is_removed_from_chair = 2
-const is_folded = 3
 
 var players_all
 var players = []
@@ -74,30 +64,30 @@ func init():
 	for i in players:
 		player_constructor(i)
 		#Is this a good implementation
-		if players_data[i][player_coins] < increase_amount :
+		if players_data[i][global_variables.DataState.player_coins] < increase_amount :
 			multiplayer.multiplayer_peer.disconnect_peer(i)
-	if players_data[players[1]][player_coins] > 0:
+	if players_data[players[1]][global_variables.DataState.player_coins] > 0:
 		table_bet(buyin, players[1] , "Buy-in")
 		
 func player_constructor(player_id):
 	players_data[player_id] = []
 	players_state[player_id] = []
-	players_data[player_id].insert(player_coins, coins)
-	players_data[player_id].insert(player_pot, initial_bid)
+	players_data[player_id].insert(global_variables.DataState.player_coins, coins)
+	players_data[player_id].insert(global_variables.DataState.player_pot, initial_bid)
 	var hand = deck_ref.draw_card(user_card_count)
 	player_ref.init.rpc_id(player_id, hand, coins, increase_amount)
-	players_data[player_id].insert(card_names, hand)
+	players_data[player_id].insert(global_variables.DataState.card_names, hand)
 	#Check if const card_values doesnt bug the game
-	players_data[player_id].insert(player_card_values, card_values)
-	players_state[player_id].insert(is_final_move, false)
-	players_state[player_id].insert(is_raising, false)
-	players_state[player_id].insert(is_removed_from_chair, false)
-	players_state[player_id].insert(is_folded, false)
+	players_data[player_id].insert(global_variables.DataState.player_card_values, card_values)
+	players_state[player_id].insert(global_variables.PlayerStates.is_final_move, false)
+	players_state[player_id].insert(global_variables.PlayerStates.is_raising, false)
+	players_state[player_id].insert(global_variables.PlayerStates.is_removed_from_chair, false)
+	players_state[player_id].insert(global_variables.PlayerStates.is_folded, false)
 	
 func table_bet(raise, user, action):
 	table_bets+=raise
-	players_data[int(user)][player_pot] += raise
-	players_data[int(user)][player_coins] -= raise
+	players_data[int(user)][global_variables.DataState.player_pot] += raise
+	players_data[int(user)][global_variables.DataState.player_coins] -= raise
 	player_ref.get_coins(user)
 	if action == "Raise" || action == "Buy-in":
 		last_bet = raise
@@ -106,16 +96,17 @@ func table_bet(raise, user, action):
 	
 		for i in players_state:
 			if i != user:
-				players_state[i][is_raising] = true
+				players_state[i][global_variables.PlayerStates.is_raising] = true
+				players_state[i][global_variables.PlayerStates.is_final_move] = false
 	
-	players_state[user][is_raising] = false
+	players_state[user][global_variables.PlayerStates.is_raising] = false
 	visuals_ref.set_label.rpc("total_bets_label", table_bets)
 	
 func format_data():
 	hand_node.Clear()
 	reform_table_cards= deck_ref.reformat_cards(table_cards, "Table")
 	for i in players_data:
-		players_data[i][player_card_values] = deck_ref.reformat_cards(players_data[i][card_names], i)
+		players_data[i][global_variables.DataState.player_card_values] = deck_ref.reformat_cards(players_data[i][global_variables.DataState.card_names], i)
 	
 	$"../JSON".to_json(players_data)
 	
@@ -129,7 +120,7 @@ func game_end():
 	for id in players_data:
 		if winners.find(str(id)) != -1:
 			visuals_ref.win_state.rpc_id(id, win_state)
-			players_data[id][player_coins] += round(table_bets / winners.size())
+			players_data[id][global_variables.DataState.player_coins] += round(table_bets / winners.size())
 		else :
 			visuals_ref.win_state.rpc_id(id, loss_state)
 		visuals_ref.set_label.rpc_id(id, "coin_label", get_bets(id))
@@ -149,7 +140,7 @@ func reset():
 	game_manager_ref.start_game()
 
 func get_cards(player):
-	return players_data[player][card_names]
+	return players_data[player][global_variables.DataState.card_names]
 	
 func get_bets(player):
-	return players_data[player][player_coins]
+	return players_data[player][global_variables.DataState.player_coins]

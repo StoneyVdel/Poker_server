@@ -15,6 +15,10 @@ run/main_scene="uid://bcjvdq3qxavfa"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+global_variables="*res://Multiplayer_Scripts/global_variables.gd"
+
 [dotnet]
 
 project/assembly_name="Poker server"
