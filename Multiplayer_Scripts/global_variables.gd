@@ -9,7 +9,7 @@ enum GameStages {
 	river, 
 	showdown
 }
-enum DataState {
+enum PlayerData {
 	player_coins, 
 	player_pot, 
 	card_names, 
@@ -21,4 +21,9 @@ enum PlayerStates {
 	is_raising, 
 	is_removed_from_chair, 
 	is_folded
+}
+
+enum UserDataType {
+	data,
+	state
 }

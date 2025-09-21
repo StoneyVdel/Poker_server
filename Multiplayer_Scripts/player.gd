@@ -27,11 +27,10 @@ func _ready() -> void:
 @rpc("authority", "call_remote", "reliable", 0)
 func set_timeout_time(time: int):
 	pass
-	
+
 @rpc("authority","call_remote", "reliable", 0)
 func add_players_to_table(user_id, chair_id):
 	opponent_ref.opponent_card_draw(2, user_id, chair_id)
-	pass
 	
 @rpc("authority", "call_remote", "reliable", 0)
 func set_player_id(id: int):
@@ -69,8 +68,7 @@ func set_increase_amount(increase_amount):
 
 @rpc("any_peer", "call_remote", "reliable", 0)
 func folded(player_id:int):
-	table_ref.players_state[player_id][3] = true
-	table_ref.players_state[player_id][0] = true
+	table_ref.players_state[player_id][gv.PlayerStates.is_folded] = true
 
 @rpc("authority", "call_remote", "reliable", 0)
 func set_raise():
@@ -80,15 +78,13 @@ func set_raise():
 func user_raise(user_id: int, raise: int, action: String):
 	table_ref.table_bet(raise, user_id, action)
 	coins = table_ref.get_bets(user_id)
-	#table_ref.reset_user_state()
 	
 @rpc("any_peer", "call_remote", "reliable", 0)
 func server_end_move(user_id: int, action:String):
-	table_ref.players_state[game_manager_ref.current_user][0] = true
+	table_ref.players_state[game_manager_ref.current_user][gv.PlayerStates.is_final_move] = true
 	#if table_ref.players_data[game_manager_ref.current_user][0] == 0:
 		#table_ref.players.erase(game_manager_ref.current_user)
-	#var next_user = game_manager_ref.find_next_user(user_id)
-	game_manager_ref.current_user = game_manager_ref.find_next_user(user_id)
+	game_manager_ref.find_next_user(user_id)
 	visuals_ref.update_action_log.rpc(str(server_ref.label_info[server_ref.chair_info.find_key(user_id)], " ", action))
 	game_manager_ref.rotation()
 

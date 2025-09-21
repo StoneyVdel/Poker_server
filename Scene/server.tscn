@@ -48,7 +48,7 @@ layout_mode = 2
 custom_minimum_size = Vector2(440, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
-text = "Timeout limit"
+text = "Timeout limit (s)"
 
 [node name="Sub_time" type="Button" parent="VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(60, 0)
@@ -84,7 +84,7 @@ layout_mode = 2
 custom_minimum_size = Vector2(440, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
-text = "Max players (max. 6)"
+text = "Player count (max. 6)"
 
 [node name="Sub_player" type="Button" parent="VBoxContainer/HBoxContainer2"]
 custom_minimum_size = Vector2(60, 0)

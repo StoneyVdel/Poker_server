@@ -26,11 +26,7 @@ func analytics_visible(on: bool):
 	pass
 	
 @rpc("authority", "call_remote", "reliable", 0)
-func cards_to_outline(game_stage: String):
-	pass
-	
-@rpc("authority", "call_remote", "reliable", 0)
-func draw_card_image(hand: Array, node: String):
+func draw_card_image(hand: Array, node: String, stage:int):
 	pass
 
 @rpc("any_peer", "call_remote", "reliable", 0)

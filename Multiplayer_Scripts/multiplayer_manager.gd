@@ -2,15 +2,8 @@ extends Node
 
 const IP_ADDRESS = "127.0.0.1"
 const PORT = 8080
-#var multiplayer_scene = preload("res://Scene/multiplayer_player.tscn")
-#var _player_spawn_node 
-var game_scene = preload("res://Scene/game.tscn")
 
 func start_server():
-	
-	#get_tree().change_scene_to_packed(game_scene)
-	#_player_spawn_node = get_tree().get_current_scene().get_node("Chair2")
-	
 	print("Starting Host")
 	var server_peer = ENetMultiplayerPeer.new()
 	server_peer.create_server(PORT)
@@ -21,7 +14,6 @@ func start_server():
 	multiplayer.peer_disconnected.connect(_del_player)
 	
 func join_game():
-	print("Joining game")
 	var client_peer = ENetMultiplayerPeer.new()
 	client_peer.create_client(IP_ADDRESS, PORT)
 	

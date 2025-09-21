@@ -24,7 +24,17 @@ func shuffle_deck():
 	deck_shuffled = deck_full.keys()
 	deck_shuffled.shuffle()
 	print(deck_shuffled)
+
+func draw_card(card_count):
+	var drawn_card_names = []
 	
+	for i in range(card_count):
+		if deck_shuffled.size() != 0:
+			drawn_card_names.insert(i, deck_shuffled[0])
+			deck_shuffled.erase(drawn_card_names[i])
+				
+	return drawn_card_names
+
 func reformat_cards(hand, user):
 	var reform_cards=[]
 	var reform_card=[]
@@ -38,14 +48,3 @@ func reformat_cards(hand, user):
 			table_ref.hand_node.AssignStringArray(reform_card)
 			
 	return reform_cards
-		
-func draw_card(card_count):
-
-	var card_drawn_name = []
-	
-	for i in range(card_count):
-		if deck_shuffled.size() != 0:
-			card_drawn_name.insert(i, deck_shuffled[0])
-			deck_shuffled.erase(card_drawn_name[i])
-				
-	return card_drawn_name

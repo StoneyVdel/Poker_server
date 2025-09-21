@@ -17,7 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-global_variables="*res://Multiplayer_Scripts/global_variables.gd"
+gv="*res://Multiplayer_Scripts/global_variables.gd"
 
 [dotnet]
 

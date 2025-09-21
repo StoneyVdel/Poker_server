@@ -25,7 +25,6 @@ func _ready():
 	if OS.has_feature("dedicated_server"):
 		print("starting server")
 		start_server()
-	#start_server()
 	player_ref = $Player
 	visuals_ref = $Visuals
 	table_ref = $GameLogic
@@ -73,7 +72,7 @@ func _del_player(id: int):
 	table_ref.players_state.erase(id)
 	table_ref.players.erase(id)
 	if game_manager_ref.current_user == id && table_ref.players.size() > 1: 
-		game_manager_ref.current_user = game_manager_ref.find_next_user(id)
+		game_manager_ref.find_next_user(id)
 		game_manager_ref.rotation()
 	if table_ref.players.size() == 1:
 		game_manager_ref.one_player()

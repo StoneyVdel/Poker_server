@@ -1,6 +1,5 @@
 extends Node
 
-const game_stage = ["pre", "flop", "turn", "river", "showdown"]
 const initial_bid = 0
 const user_card_count = 2
 const win_state = true
@@ -23,6 +22,7 @@ var deck_ref
 var player_ref
 var visuals_ref
 var server_ref
+var opponent_ref
 
 var room_name = "Test Room"
 var coins = 100
@@ -34,13 +34,13 @@ var last_bet = 0
 var hand_node
 var reform_player_cards = []
 var reform_table_cards
-var room_node
-var winners
+var room_node 
 
 func _ready() -> void:
 	deck_ref = $"../DeckLogic"
 	game_manager_ref = $"../GameManager"
 	player_ref = $"../Player"
+	opponent_ref = $"../Opponent"
 	hand_node= load("res://Multiplayer_Scripts/Program.cs").new()
 	room_node = load("res://Multiplayer_Scripts/Room.cs").new()
 	var _user_handler = load("res://Multiplayer_Scripts/ApplicationUser.cs").new()
@@ -52,7 +52,7 @@ func sort_by_turns():
 	if dealer_index == players_all.size()-1:
 		for player in players_all:
 			players.append(player)
-	elif dealer_index != players_all.size()-1:
+	else:
 		for i in range(dealer_index+1, players_all.size()):
 			players.append(players_all[i])
 		for i in range(dealer_index+1):
@@ -61,66 +61,66 @@ func sort_by_turns():
 func init():
 	dealer = players_all.pick_random()
 	sort_by_turns()
+	game_manager_ref.current_user = players[0]
 	for i in players:
 		player_constructor(i)
+		opponent_ref.opponent_card_draw.rpc(2, i)
 		#Is this a good implementation
-		if players_data[i][global_variables.DataState.player_coins] < increase_amount :
+		if players_data[i][gv.PlayerData.player_coins] < increase_amount :
 			multiplayer.multiplayer_peer.disconnect_peer(i)
-	if players_data[players[1]][global_variables.DataState.player_coins] > 0:
+	if players_data[players[1]][gv.PlayerData.player_coins] > 0:
 		table_bet(buyin, players[1] , "Buy-in")
 		
 func player_constructor(player_id):
 	players_data[player_id] = []
 	players_state[player_id] = []
-	players_data[player_id].insert(global_variables.DataState.player_coins, coins)
-	players_data[player_id].insert(global_variables.DataState.player_pot, initial_bid)
+	players_data[player_id].insert(gv.PlayerData.player_coins, coins)
+	players_data[player_id].insert(gv.PlayerData.player_pot, initial_bid)
 	var hand = deck_ref.draw_card(user_card_count)
 	player_ref.init.rpc_id(player_id, hand, coins, increase_amount)
-	players_data[player_id].insert(global_variables.DataState.card_names, hand)
-	#Check if const card_values doesnt bug the game
-	players_data[player_id].insert(global_variables.DataState.player_card_values, card_values)
-	players_state[player_id].insert(global_variables.PlayerStates.is_final_move, false)
-	players_state[player_id].insert(global_variables.PlayerStates.is_raising, false)
-	players_state[player_id].insert(global_variables.PlayerStates.is_removed_from_chair, false)
-	players_state[player_id].insert(global_variables.PlayerStates.is_folded, false)
+	players_data[player_id].insert(gv.PlayerData.card_names, hand)
+	players_data[player_id].insert(gv.PlayerData.player_card_values, card_values)
+	players_state[player_id].insert(gv.PlayerStates.is_final_move, false)
+	players_state[player_id].insert(gv.PlayerStates.is_raising, false)
+	players_state[player_id].insert(gv.PlayerStates.is_removed_from_chair, false)
+	players_state[player_id].insert(gv.PlayerStates.is_folded, false)
 	
 func table_bet(raise, user, action):
 	table_bets+=raise
-	players_data[int(user)][global_variables.DataState.player_pot] += raise
-	players_data[int(user)][global_variables.DataState.player_coins] -= raise
+	players_data[int(user)][gv.PlayerData.player_pot] += raise
+	players_data[int(user)][gv.PlayerData.player_coins] -= raise
 	player_ref.get_coins(user)
 	if action == "Raise" || action == "Buy-in":
 		last_bet = raise
-		#Send to client
 		player_ref.set_raise.rpc(last_bet)
 	
 		for i in players_state:
 			if i != user:
-				players_state[i][global_variables.PlayerStates.is_raising] = true
-				players_state[i][global_variables.PlayerStates.is_final_move] = false
+				players_state[i][gv.PlayerStates.is_raising] = true
+				players_state[i][gv.PlayerStates.is_final_move] = false
 	
-	players_state[user][global_variables.PlayerStates.is_raising] = false
+	players_state[user][gv.PlayerStates.is_raising] = false
 	visuals_ref.set_label.rpc("total_bets_label", table_bets)
 	
 func format_data():
 	hand_node.Clear()
 	reform_table_cards= deck_ref.reformat_cards(table_cards, "Table")
 	for i in players_data:
-		players_data[i][global_variables.DataState.player_card_values] = deck_ref.reformat_cards(players_data[i][global_variables.DataState.card_names], i)
+		players_data[i][gv.PlayerData.player_card_values] = deck_ref.reformat_cards(players_data[i][gv.PlayerData.card_names], i)
 	
 	$"../JSON".to_json(players_data)
 	
 	hand_node.GetDataFromJSON($"../JSON".json_string)
 	hand_node.TestProgram()
 	print(hand_node.WinnerNames)
-	winners = hand_node.WinnerNames
-	game_end()
+	var winners = hand_node.WinnerNames
+	game_end(winners)
 
-func game_end():
+func game_end(winners:Array):
 	for id in players_data:
 		if winners.find(str(id)) != -1:
 			visuals_ref.win_state.rpc_id(id, win_state)
-			players_data[id][global_variables.DataState.player_coins] += round(table_bets / winners.size())
+			players_data[id][gv.PlayerData.player_coins] += round(table_bets / winners.size())
 		else :
 			visuals_ref.win_state.rpc_id(id, loss_state)
 		visuals_ref.set_label.rpc_id(id, "coin_label", get_bets(id))
@@ -136,11 +136,25 @@ func reset():
 	table_cards.clear()
 	table_bets = initial_bid
 	visuals_ref.set_label.rpc("total_bets_label", table_bets)
-	game_manager_ref.game_stage = "pre"
+	game_manager_ref.game_stage = gv.GameStages.pre
 	game_manager_ref.start_game()
 
+func get_user_data(data_type:int, user_index: int, data_index : int):
+	match data_type:
+		gv.UserDataType.data:
+			return players_data[user_index][data_index]
+		gv.UserDataType.state:
+			return players_state[user_index][data_index]
+		
+func table_draw(card_count):
+	var hand = deck_ref.draw_card(card_count)
+	for i in hand:
+		table_cards.append(i)
+	visuals_ref.draw_card_image.rpc(hand, "Outlines", game_manager_ref.game_stage)
+	game_manager_ref.rotation()
+	
 func get_cards(player):
-	return players_data[player][global_variables.DataState.card_names]
+	return players_data[player][gv.PlayerData.card_names]
 	
 func get_bets(player):
-	return players_data[player][global_variables.DataState.player_coins]
+	return players_data[player][gv.PlayerData.player_coins]
