@@ -27,9 +27,9 @@ public partial class Program : Node
 		}
 		public void Clear()
 		{
-			CardsFromGodot.Clear();
-			users.Clear();
-			UserBets.Clear();
+			CardsFromGodot?.Clear();
+			users?.Clear();
+			UserBets?.Clear();
 		}
 		public void GetDataFromJSON(string json)
 		{
@@ -150,6 +150,11 @@ public partial class Program : Node
 			int i = 0;
 			//foreach (var res in result)
 			//{
+			
+			foreach (var res in result) {
+				GD.Print(res);
+			}
+			if (result != null) {
 				foreach (var user in result[0].Winners)
 				{
 					WinnersList.Add(user.Name);
@@ -162,5 +167,6 @@ public partial class Program : Node
 				GD.Print(result[0].PotAmount);
 				GD.Print(result[0].OriginalPotAmount);
 			GD.Print("Winner End");
+			}
 		}
 }

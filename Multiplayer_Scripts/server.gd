@@ -27,7 +27,7 @@ func _ready():
 		start_server()
 	player_ref = $Player
 	visuals_ref = $Visuals
-	table_ref = $GameLogic
+	table_ref = $Table
 	game_manager_ref = $GameManager
 	
 func start_server():

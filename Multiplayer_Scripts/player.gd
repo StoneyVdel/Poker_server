@@ -13,15 +13,17 @@ var player_cards
 @export var coins = 100
 @export var player_id : int
 var increase_amount
+var utils_ref
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	visuals_ref = $"../Visuals"
 	#timeout_timer = $"../TimeoutTimer"
 	opponent_ref = $"../Opponent"
-	table_ref = $"../GameLogic"
+	table_ref = $"../Table"
 	game_manager_ref = $"../GameManager"
 	server_ref = $".."
+	utils_ref = $"../Utils"
 	increase_amount = table_ref.increase_amount
 
 @rpc("authority", "call_remote", "reliable", 0)
@@ -51,7 +53,7 @@ func init(player_cards: Array, coins: int, increase_amount: int):
 
 @rpc("any_peer", "call_remote", "reliable", 0)
 func get_coins(player_id:int):
-	var coin = table_ref.get_bets(player_id)
+	var coin = gv.user_inst[player_id].coins
 	set_coins.rpc_id(player_id, coin)
 	
 @rpc("authority", "call_remote", "reliable", 0)
@@ -68,10 +70,14 @@ func set_increase_amount(increase_amount):
 
 @rpc("any_peer", "call_remote", "reliable", 0)
 func folded(player_id:int):
-	table_ref.players_state[player_id][gv.PlayerStates.is_folded] = true
+	gv.user_inst[player_id].is_folded = true
 
 @rpc("authority", "call_remote", "reliable", 0)
 func set_raise():
+	pass
+
+@rpc("authority", "call_remote", "reliable", 0)
+func set_cards(cards):
 	pass
 	
 @rpc("any_peer", "call_remote", "reliable", 0)
@@ -81,10 +87,8 @@ func user_raise(user_id: int, raise: int, action: String):
 	
 @rpc("any_peer", "call_remote", "reliable", 0)
 func server_end_move(user_id: int, action:String):
-	table_ref.players_state[game_manager_ref.current_user][gv.PlayerStates.is_final_move] = true
-	#if table_ref.players_data[game_manager_ref.current_user][0] == 0:
-		#table_ref.players.erase(game_manager_ref.current_user)
-	game_manager_ref.find_next_user(user_id)
+	gv.user_inst.is_final_move = true
+	utils_ref.find_next_user(user_id)
 	visuals_ref.update_action_log.rpc(str(server_ref.label_info[server_ref.chair_info.find_key(user_id)], " ", action))
 	game_manager_ref.rotation()
 

@@ -8,7 +8,7 @@ var table_ref
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	card_db_ref = preload("res://Multiplayer_Scripts/Card_Database.gd")
-	table_ref = $"../GameLogic"
+	table_ref = $"../Table"
 	create_deck()
 	shuffle_deck()
 
