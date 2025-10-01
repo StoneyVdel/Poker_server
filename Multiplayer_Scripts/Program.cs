@@ -34,41 +34,41 @@ public partial class Program : Node
 		public void GetDataFromJSON(string json)
 		{
 			UserBets = new List<int>();
+			users = new List<ApplicationUser>();
+
 			JsonNode root = JsonNode.Parse(json);
 			foreach (var kvp in root.AsObject())
 			{
 				string key = kvp.Key;
 				JsonArray data = kvp.Value.AsArray();
-				
+
 				int chips = data[0].GetValue<int>();
 				int bets = data[1].GetValue<int>();
 				UserBets.Add(bets);
+
 				JsonArray cards = data[2].AsArray();
-				JsonArray values = data[3].AsArray();
-				
 				List<string[]> card_values = new List<string[]>();
-				
-				//GD.Print("Values:");
-				foreach (JsonArray pair in values)
+
+				foreach (JsonArray pair in cards)
 				{
 					string number = pair[0].ToString();
 					string suit = pair[1].ToString();
-					string[] card_value = new string [] { number, suit };
-					card_values.Add(card_value);
+					card_values.Add(new string[] { number, suit });
 				}
-				//GD.Print(key);
+
 				ApplicationUser user = new ApplicationUser
 				{
 					Name = key,
 					PlayerCards = card_values,
 					Chips = chips
 				};
-				//GD.Print(user);
+
 				users.Add(user);
 			}
-			foreach (int i in UserBets)
+
+			foreach (int bet in UserBets)
 			{
-				GD.Print(i);
+				GD.Print(bet);
 			}
 		}
 		public void TestProgram()

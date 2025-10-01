@@ -83,12 +83,12 @@ func set_cards(cards):
 @rpc("any_peer", "call_remote", "reliable", 0)
 func user_raise(user_id: int, raise: int, action: String):
 	table_ref.table_bet(raise, user_id, action)
-	coins = table_ref.get_bets(user_id)
+	#coins = table_ref.get_bets(user_id)
 	
 @rpc("any_peer", "call_remote", "reliable", 0)
 func server_end_move(user_id: int, action:String):
-	gv.user_inst.is_final_move = true
-	utils_ref.find_next_user(user_id)
+	gv.user_inst[user_id].is_final_move = true
+	game_manager_ref.current_user = utils_ref.find_next_user(game_manager_ref.current_user)
 	visuals_ref.update_action_log.rpc(str(server_ref.label_info[server_ref.chair_info.find_key(user_id)], " ", action))
 	game_manager_ref.rotation()
 

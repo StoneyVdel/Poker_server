@@ -37,23 +37,27 @@ func start_game():
 	player_ref.disable_user_input.rpc()
 	#await get_tree().create_timer(1).timeout
 	#Temp
-	gv.user_inst = utils_ref.set_players()
-	table_ref.table_bet(table_ref.buyin, gv.user_inst.keys().get(1) , "Buy-in")
+	utils_ref.set_players()
+	table_ref.table_bet(table_ref.buyin, gv.players[1] , "Buy-in")
+	player_ref.user_turn.rpc_id(int(current_user), \
+		gv.user_inst[current_user].is_raising, table_ref.last_bet)
 	rotation()
 	
-#func one_player():
-	#player_ref.disable_user_input.rpc()
-	#var winners = [str(current_user)]
-	#table_ref.game_end(winners)
+func one_player(user):
+	player_ref.disable_user_input.rpc()
+	var winners = [user]
+	print(winners)
+	utils_ref.game_end(winners)
 
 func rotation():
 	var state_check = true
 	check_if_remove()
 	
 	#Check if all players are folded
-	if utils_ref.is_last_player() == true:
+	var last_user_check = utils_ref.is_last_player()
+	if last_user_check[0] == true :
 		state_check=false
-		#one_player()
+		one_player(last_user_check[1])
 		
 	for i in gv.players:
 		if  gv.user_inst[i].is_final_move == false:
@@ -71,17 +75,16 @@ func rotation():
 		elif game_stage == gv.GameStages.river:
 			table_ref.table_draw(1)
 		elif game_stage == gv.GameStages.showdown:
-			table_ref.format_data()
-			var all_player_cards = opponent_ref.get_player_cards()
-			opponent_ref.show_opponent_hand.rpc(table_ref.players, all_player_cards)
-	else : 
-		player_ref.user_turn.rpc_id(int(current_user), \
-		gv.user_inst[current_user].is_raising, table_ref.last_bet)
-			#if table_ref.players_data[current_user][gv.PlayerData.player_coins] == 0:
-				#no_money()
-			#else:
-		#utils_ref.find_next_user(current_user)
+			#fix
+			utils_ref.format_data()
+			var all_player_cards = utils_ref.get_player_cards()
+			opponent_ref.show_opponent_hand.rpc(gv.players, all_player_cards)
+		rotated()
 
+func rotated():
+	for i in gv.players:
+		gv.user_inst[i].is_final_move = false
+		
 func check_if_remove():
 	for i in gv.players:
 		if gv.user_inst[i].is_removed == true:

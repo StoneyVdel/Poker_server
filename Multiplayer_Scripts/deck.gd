@@ -4,11 +4,14 @@ var card_db_ref
 var deck_full = {}
 var deck_shuffled = []
 var table_ref
+var utils_ref
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	card_db_ref = preload("res://Multiplayer_Scripts/Card_Database.gd")
 	table_ref = $"../Table"
+	utils_ref = $"../Utils"
+	
 	create_deck()
 	shuffle_deck()
 
@@ -35,7 +38,7 @@ func draw_card(card_count):
 				
 	return drawn_card_names
 
-func reformat_cards(hand, user):
+func reformat_cards(hand: Array, user):
 	var reform_cards=[]
 	var reform_card=[]
 	for i in hand.size():
@@ -45,6 +48,6 @@ func reformat_cards(hand, user):
 		reform_cards.append(reform_card.duplicate())
 		
 		if str(user) == "Table":
-			table_ref.hand_node.AssignStringArray(reform_card)
+			utils_ref.hand_node.AssignStringArray(reform_card)
 			
 	return reform_cards

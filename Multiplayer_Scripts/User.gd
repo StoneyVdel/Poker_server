@@ -26,13 +26,10 @@ var initial_bid = 0
 var card_values = []
 
 func _ready() -> void:
-	deck_ref = $DeckLogic
-	player_ref = $Player
-	table_ref = $Table
+	pass
 	
-func set_data(id, cards, coin):
+func set_data(id, coin):
 	player_id = id
-	hand = cards
 	coins = coin
 	
 func set_coins(amount: int):

@@ -36,7 +36,7 @@ func table_bet(raise, user, action):
 	if action == "Raise" || action == "Buy-in":
 		last_bet = raise
 		player_ref.set_raise.rpc(last_bet)
-		for i in gv.user_inst.keys():
+		for i in gv.players:
 			if i != user:
 				gv.user_inst[i].is_raising = true
 				gv.user_inst[i].is_final_move = false

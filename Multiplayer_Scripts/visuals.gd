@@ -7,7 +7,7 @@ var action_log
 
 func _ready() -> void:
 	#action_log = $"../ActionLog"
-	table_ref = $"../GameLogic"
+	table_ref = $"../Table"
 	
 func action_label_action(action):
 	action_scene_label.text = action
@@ -56,5 +56,7 @@ func win_state(state: bool):
 
 @rpc("any_peer", "call_remote", "reliable", 0)
 func clear_chair(user: String):
-	table_ref.players.erase(user)
-	table_ref.players_data.erase(user)
+	pass
+	#Might need
+	#table_ref.players.erase(user)
+	#table_ref.players_data.erase(user)

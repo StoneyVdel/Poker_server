@@ -65,16 +65,23 @@ func sort_by_turns():
 func format_data():
 	hand_node.Clear()
 	table_ref.reform_table_cards= deck_ref.reformat_cards(table_ref.table_cards, "Table")
-	#for i in players_data:
-		#players_data[i][gv.PlayerData.player_card_values] = deck_ref.reformat_cards(players_data[i][gv.PlayerData.card_names], i)
-	#
-	#$"../JSON".to_json(players_data)
+	for i in gv.players:
+		gv.user_inst[i].hand_values = deck_ref.reformat_cards(gv.user_inst[i].hand, i)
+	var user_data = prepare_user_data()
+	$"../JSON".to_json(user_data)
 	
 	hand_node.GetDataFromJSON($"../JSON".json_string)
 	hand_node.TestProgram()
 	print(hand_node.WinnerNames)
-	#var winners = hand_node.WinnerNames
-	#game_end(winners)
+	var winners = hand_node.WinnerNames
+	game_end(winners)
+
+func prepare_user_data():
+	var user_dict = {}
+	for i in gv.players:
+		var user = [gv.user_inst[i].coins, gv.user_inst[i].coins_bet, gv.user_inst[i].hand_values]
+		user_dict[i] = user.duplicate()
+	return user_dict
 	
 func reset():
 	visuals_ref.clear_table.rpc()
@@ -87,7 +94,7 @@ func reset():
 	game_manager_ref.start_game()
 	
 func game_end(winners:Array):
-	for id in game_manager_ref.players:
+	for id in gv.players:
 		if winners.find(str(id)) != -1:
 			visuals_ref.win_state.rpc_id(id, win_state)
 			#players_data[id][gv.PlayerData.player_coins] += round(table_bets / winners.size())
@@ -97,31 +104,38 @@ func game_end(winners:Array):
 	reset()
 	
 func find_next_user(user):
-	var next_user_index = table_ref.players.find(user) + 1
+	var next_user_index = gv.players.find(user) + 1
 	var next_user
-		
-	if is_last_player() == false:
-		if next_user_index < table_ref.players.size():
-			next_user = table_ref.players[next_user_index]
-		elif next_user_index == table_ref.players.size():
-			next_user = table_ref.players[0]
-	if game_manager_ref.User_inst[next_user].is_folded == true:
-		find_next_user(next_user)
-	else:
-		return next_user
+	var last_user_check = is_last_player()
+	if last_user_check[0] == false:
+		if next_user_index < gv.players.size():
+			next_user = gv.players[next_user_index]
+		elif next_user_index == gv.players.size():
+			next_user = gv.players[0]
+		if gv.user_inst[next_user].is_folded == true:
+			find_next_user(next_user)
+		else:
+			player_ref.user_turn.rpc_id(int(next_user), \
+			gv.user_inst[next_user].is_raising, table_ref.last_bet)
+			return next_user
 		
 func check_if_user_valid():
 	pass
 	
 func is_last_player():
 	var not_folded_cound = 0
+	var last_user = [false, null]
 	for user in gv.players:
-		if game_manager_ref.user_inst[user].is_folded == true:
+		if gv.user_inst[user].is_folded == true:
 			not_folded_cound+=1
+		else:
+			last_user[1] = str(user)
 	if not_folded_cound == 1:
-		return true
+		last_user[0] = true
+		return last_user
 	else :
-		return false
+		last_user[0] = false
+		return last_user
 
 func get_player_cards():
 	pass
