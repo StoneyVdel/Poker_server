@@ -4,10 +4,6 @@ class_name User
 
 const user_card_count = 2
 
-var deck_ref
-var player_ref
-var table_ref
-
 var player_id
 var hand = []
 var hand_values = []
@@ -34,10 +30,12 @@ func set_data(id, coin):
 	
 func set_coins(amount: int):
 	coins = amount
-
+	
+func get_coins():
+	return coins
+	
 func set_initial_bid(amount: int):
 	initial_bid = amount
 
 func set_cards(cards:Array):
 	hand = cards
-	

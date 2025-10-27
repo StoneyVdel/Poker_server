@@ -68,16 +68,13 @@ func _del_player(id: int):
 	players_id.erase(id)
 	chair_id=chair_info.find_key(id)
 	chair_info.erase(chair_info.find_key(id))
-	table_ref.players_data.erase(id)
-	table_ref.players_state.erase(id)
-	table_ref.players.erase(id)
-	if game_manager_ref.current_user == id && table_ref.players.size() > 1: 
+	if game_manager_ref.current_user == id && players_id.size() > 1: 
 		game_manager_ref.find_next_user(id)
 		game_manager_ref.rotation()
-	if table_ref.players.size() == 1:
+	if players_id.size() == 1:
 		game_manager_ref.one_player()
 		
-	if table_ref.players.size() == 0:
+	if players_id.size() == 0:
 		print("Reloading...")
 		multiplayer.multiplayer_peer.close()
 		get_tree().reload_current_scene()

@@ -52,6 +52,8 @@ func one_player(user):
 func rotation():
 	var state_check = true
 	check_if_remove()
+	for i in gv.players:
+		visuals_ref.set_chair_label.rpc(i, str(gv.user_inst[i].get_coins()))
 	
 	#Check if all players are folded
 	var last_user_check = utils_ref.is_last_player()
@@ -89,7 +91,6 @@ func check_if_remove():
 	for i in gv.players:
 		if gv.user_inst[i].is_removed == true:
 			visuals_ref.clear_chair(str(i))
-	pass
 
 func check_states():
 	pass

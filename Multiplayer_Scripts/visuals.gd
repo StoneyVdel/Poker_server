@@ -50,6 +50,10 @@ func set_chair(chair_info: Dictionary, label_info : Dictionary):
 	for id in chair_info:
 		print("Chair :", id, "for user : ", chair_info[id])
 
+@rpc("authority", "call_remote", "reliable", 0)
+func set_chair_label(user_id: int, label_data: String):
+	pass
+	
 @rpc("any_peer", "call_remote", "reliable", 0)
 func win_state(state: bool):
 	pass

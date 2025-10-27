@@ -64,7 +64,7 @@ func sort_by_turns():
 	
 func format_data():
 	hand_node.Clear()
-	table_ref.reform_table_cards= deck_ref.reformat_cards(table_ref.table_cards, "Table")
+	table_ref.reform_table_cards = deck_ref.reformat_cards(table_ref.table_cards, "Table")
 	for i in gv.players:
 		gv.user_inst[i].hand_values = deck_ref.reformat_cards(gv.user_inst[i].hand, i)
 	var user_data = prepare_user_data()
@@ -138,12 +138,10 @@ func is_last_player():
 		return last_user
 
 func get_player_cards():
-	pass
-	#var players = table_ref.players
-	#var all_player_cards = {}
-	#for i in players:
-		#all_player_cards[i] = []
-		#all_player_cards[i]=table_ref.players_data[i][2]
+	var all_player_cards = {}
+	for i in gv.players:
+		all_player_cards[i] = []
+		all_player_cards[i]=gv.user_inst[i].hand
 		
-	#return all_player_cards
+	return all_player_cards
 	
