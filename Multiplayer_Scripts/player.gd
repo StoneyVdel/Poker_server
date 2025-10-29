@@ -71,6 +71,7 @@ func set_increase_amount(increase_amount):
 @rpc("any_peer", "call_remote", "reliable", 0)
 func folded(player_id:int):
 	gv.user_inst[player_id].is_folded = true
+	visuals_ref.set_chair_label.rpc(player_id, str(gv.user_inst[player_id].get_coins(),'F'))
 
 @rpc("authority", "call_remote", "reliable", 0)
 func set_raise():

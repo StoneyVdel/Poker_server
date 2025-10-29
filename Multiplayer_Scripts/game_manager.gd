@@ -31,13 +31,13 @@ func _ready() -> void:
 
 func on_timeout():
 	table_ref.table_cards.clear()
-	start_game()
+	start_game(false)
 	
-func start_game():
+func start_game(new_game: bool):
 	player_ref.disable_user_input.rpc()
 	#await get_tree().create_timer(1).timeout
 	#Temp
-	utils_ref.set_players()
+	utils_ref.set_players(new_game)
 	table_ref.table_bet(table_ref.buyin, gv.players[1] , "Buy-in")
 	player_ref.user_turn.rpc_id(int(current_user), \
 		gv.user_inst[current_user].is_raising, table_ref.last_bet)
@@ -57,9 +57,9 @@ func rotation():
 	
 	#Check if all players are folded
 	var last_user_check = utils_ref.is_last_player()
-	if last_user_check[0] == true :
+	if last_user_check[gv.LastPlayer.isLast] == true :
 		state_check=false
-		one_player(last_user_check[1])
+		one_player(last_user_check[gv.LastPlayer.user])
 		
 	for i in gv.players:
 		if  gv.user_inst[i].is_final_move == false:

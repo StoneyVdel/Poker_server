@@ -36,20 +36,26 @@ func set_user_data(id, coins, increase_amount, instance):
 	player_ref.init.rpc_id(id, coins, increase_amount)
 	instance.set_data(id, coins)
 	
-func set_players():
-	gv.players = sort_by_turns()
+func set_players(clear_all = false):
+	if clear_all:
+		gv.players = sort_by_turns()
+	else:
+		gv.players = sort_by_turns(gv.players[1])
 	game_manager_ref.current_user = gv.players[0]
 	for i in gv.players:
-		gv.user_inst[i] = player_constructor(i)
+		if clear_all:
+			gv.user_inst[i] = player_constructor(i)
+		else:
+			gv.user_inst[i].clear_most()
 		gv.user_inst[i].hand = deck_ref.draw_card(2)
 		player_ref.set_cards.rpc_id(i, gv.user_inst[i].hand)
 		opponent_ref.opponent_card_draw.rpc(2, i)
-	
-
-func sort_by_turns():
+		
+func sort_by_turns(dealer = -1):
 	var players = []
 	var players_all = server_ref.players_id.duplicate()
-	var dealer = players_all.pick_random()
+	if dealer == -1:
+		dealer = players_all.pick_random()
 	var dealer_index = players_all.find(dealer)
 	if dealer_index == players_all.size()-1:
 		for player in players_all:
@@ -91,13 +97,15 @@ func reset():
 	table_ref.table_bets = table_ref.initial_bid
 	visuals_ref.set_label.rpc("total_bets_label", table_ref.table_bets)
 	game_manager_ref.game_stage = gv.GameStages.pre
-	game_manager_ref.start_game()
+	game_manager_ref.start_game(false)
 	
 func game_end(winners:Array):
+	
 	for id in gv.players:
 		if winners.find(str(id)) != -1:
 			visuals_ref.win_state.rpc_id(id, win_state)
-			#players_data[id][gv.PlayerData.player_coins] += round(table_bets / winners.size())
+			var wins = gv.user_inst[id].get_coins() + round(table_ref.table_bets / winners.size())
+			gv.user_inst[id].set_coins(wins)
 		else :
 			visuals_ref.win_state.rpc_id(id, loss_state)
 		#visuals_ref.set_label.rpc_id(id, "coin_label", get_bets(id))
@@ -107,7 +115,7 @@ func find_next_user(user):
 	var next_user_index = gv.players.find(user) + 1
 	var next_user
 	var last_user_check = is_last_player()
-	if last_user_check[0] == false:
+	if last_user_check[gv.LastPlayer.isLast] == false:
 		if next_user_index < gv.players.size():
 			next_user = gv.players[next_user_index]
 		elif next_user_index == gv.players.size():

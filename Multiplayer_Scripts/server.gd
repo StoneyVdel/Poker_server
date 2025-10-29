@@ -7,13 +7,17 @@ var clients_amount = 6
 var players = {}
 var players_id = []
 var player_info = {}
+
 var player_ref
-var chair_id = 0
-var chair_info = {}
-var label_info = {}
+var utils_ref
 var visuals_ref
 var table_ref
 var game_manager_ref
+
+var chair_id = 0
+var chair_info = {}
+var label_info = {}
+
 var new_client_name
 var to_timer
 var player_count
@@ -29,6 +33,7 @@ func _ready():
 	visuals_ref = $Visuals
 	table_ref = $Table
 	game_manager_ref = $GameManager
+	utils_ref = $Utils
 	
 func start_server():
 	print("Starting Host")
@@ -57,7 +62,7 @@ func _add_player_to_peer(id: int):
 	if new_client_name != null:
 		add_players_to_table(id)
 		if players_id.size() > 1:
-			$GameManager.start_game()
+			$GameManager.start_game(true)
 			visuals_ref.are_analytics_allowed.rpc(bool($VBoxContainer/HBoxContainer6/Analytics.button_pressed))
 			visuals_ref.analytics_visible.rpc(bool($VBoxContainer/HBoxContainer6/Analytics.button_pressed))
 	pass
@@ -71,8 +76,10 @@ func _del_player(id: int):
 	if game_manager_ref.current_user == id && players_id.size() > 1: 
 		game_manager_ref.find_next_user(id)
 		game_manager_ref.rotation()
+		
 	if players_id.size() == 1:
-		game_manager_ref.one_player()
+		var last_user_check = utils_ref.is_last_player()
+		game_manager_ref.one_player(last_user_check[gv.LastPlayer.user])
 		
 	if players_id.size() == 0:
 		print("Reloading...")

@@ -10,5 +10,10 @@ enum GameStages {
 	showdown
 }
 
+enum LastPlayer {
+	isLast,
+	user
+}
+
 var players = []
 var user_inst = {}

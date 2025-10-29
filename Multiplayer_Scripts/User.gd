@@ -39,3 +39,24 @@ func set_initial_bid(amount: int):
 
 func set_cards(cards:Array):
 	hand = cards
+
+func clear_cards():
+	hand.clear()
+	hand_values.clear()
+	card_values.clear()
+	
+func clear_states():
+	is_final_move = false
+	is_raising = 	false
+	is_removed = 	false
+	is_folded = 	false
+	has_no_money = 	false
+	
+func clear_coin_data():
+	coins_bet = 0
+	initial_bid = 0
+	
+func clear_most():
+	clear_cards()
+	clear_states()
+	clear_coin_data()
